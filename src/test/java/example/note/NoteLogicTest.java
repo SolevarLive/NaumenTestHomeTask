@@ -13,7 +13,7 @@ class NoteLogicTest {
     /**
      * Экземпляр класса NoteLogic для тестирования
      */
-    NoteLogic noteLogic = new NoteLogic();
+     private final NoteLogic noteLogic = new NoteLogic();
 
     /**
      * Тест для команды /add и /notes
@@ -75,11 +75,14 @@ class NoteLogicTest {
 
     /**
      * Тест для обработки неизвестной команды
-     * Проверяет, что NoteLogic бросает исключение Exception для неизвестных сообщений
+     * Проверяет, что NoteLogic бросает IllegalArgumentException для неизвестных сообщений
      */
     @Test
     void unknownTest() {
         String message = "/unknowncommand";
-        assertThrows(Exception.class, () -> noteLogic.handleMessage(message));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            noteLogic.handleMessage(message);
+        });
+        assertEquals("Unknown command", exception.getMessage());
     }
 }

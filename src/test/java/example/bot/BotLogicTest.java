@@ -1,14 +1,9 @@
 package example.bot;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -31,78 +26,6 @@ public class BotLogicTest {
     }
 
     /**
-     * Тестирует команду /notify
-     * Проверяет, что бот правильно устанавливает напоминание и отправляет уведомление через заданное время(имитируем ожидание)
-     */
-    @Test
-    public void testNotify() throws InterruptedException {
-        bot.processCommand(user, "/notify");
-        bot.processCommand(user, "Привет!");
-        bot.processCommand(user, "2");
-
-        String actualSetReminderResponse = null;
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < 2000) {
-            actualSetReminderResponse = mockBot.getLastMessage();
-            if (actualSetReminderResponse != null && actualSetReminderResponse.contains("Сработало напоминание: 'Привет!'")) {
-                break;
-            }
-            Thread.sleep(100);
-        }
-
-        List<String> expectedMessages = Arrays.asList(
-                "Введите текст напоминания",
-                "Через сколько секунд напомнить?",
-                "Напоминание установлено",
-                "Сработало напоминание: 'Привет!'"
-        );
-
-        List<String> actualMessages = mockBot.getMessages();
-        assertEquals(expectedMessages, actualMessages);
-
-    }
-
-
-    /**
-     * Тестирует команду повторения вопроса в боте.
-     * Этот тест проверяет, что бот корректно обрабатывает команду "/repeat"
-     */
-    @Test
-    public void testRepeatCommandFalse() {
-        bot.processCommand(user, "/repeat");
-
-        String expectedQuestion = "Нет вопросов для повторения";
-        String actualQuestion = mockBot.getLastMessage();
-        assertEquals(expectedQuestion, actualQuestion);
-    }
-    /**
-     * Тестирует команду повторения вопроса в боте.
-     * Этот тест проверяет, что бот отправляет тест на повторение (командйо "/repeat") полсе ошибочного ответа в тесте
-     */
-    @Test
-    public void testRepeatCommandTrue(){
-        bot.processCommand(user, "/test");
-        bot.processCommand(user, "10");
-        bot.processCommand(user, "6");
-        bot.processCommand(user, "/repeat");
-        bot.processCommand(user, "100");
-
-        List<String> expectedMessages = Arrays.asList(
-                "Вычислите степень: 10^2",
-                "Вы ошиблись, верный ответ: 100",
-                "Сколько будет 2 + 2 * 2",
-                "Правильный ответ!",
-                "Тест завершен",
-                "Вычислите степень: 10^2",
-                "Правильный ответ!",
-                "Тест завершен"
-        );
-
-        List<String> actualMessages = mockBot.getMessages();
-        assertEquals(expectedMessages, actualMessages);
-    }
-
-    /**
      * Проверка команды /test
      * Проверяет, что бот отправляет правильные сообщения в правильной последовательности
      * на корректные ответы
@@ -110,49 +33,130 @@ public class BotLogicTest {
     @Test
     public void testCommandTest() {
         bot.processCommand(user, "/test");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessages().get(0));
         bot.processCommand(user, "100");
+        Assertions.assertEquals("Правильный ответ!",
+                mockBot.getMessages().get(1));
+        Assertions.assertEquals("Сколько будет 2 + 2 * 2",
+                mockBot.getMessages().get(2));
         bot.processCommand(user, "6");
-
-
-        List<String> expectedMessages = Arrays.asList(
-                "Вычислите степень: 10^2",
-                "Правильный ответ!",
-                "Сколько будет 2 + 2 * 2",
-                "Правильный ответ!",
-                "Тест завершен"
-        );
-
-        List<String> actualMessages = mockBot.getMessages();
-        assertEquals(expectedMessages, actualMessages);
+        Assertions.assertEquals("Правильный ответ!",
+                mockBot.getMessages().get(3));
+        Assertions.assertEquals("Тест завершен",
+                mockBot.getMessages().get(4));
     }
 
     /**
-     * MockBot является реализацией интерфейса Bot, используемой для тестирования
+     * Проверка команды /test
+     * Проверяет, что бот отправляет правильные сообщения в правильной последовательности
+     * на не корректные ответы
      */
-    class MockBot implements Bot {
-        private final List<String> messages = new ArrayList<>();
-
-        /**
-         * Сохраняет сообщение в список отправленных сообщений
-         */
-        @Override
-        public void sendMessage(Long chatId, String message) {
-            messages.add(message);
-        }
-
-        /**
-         * Возвращает последнее отправленное сообщение
-         */
-        public String getLastMessage() {
-            return messages.isEmpty() ? null : messages.get(messages.size() - 1);
-        }
-
-
-        /**
-         * Возвращает отправленные сообщения
-         */
-        public List<String> getMessages() {
-            return new ArrayList<>(messages);
-        }
+    @Test
+    public void testCommandTestIncorrectAnswers() {
+        bot.processCommand(user, "/test");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessages().get(0));
+        bot.processCommand(user, "10");
+        Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
+                mockBot.getMessages().get(1));
+        Assertions.assertEquals("Сколько будет 2 + 2 * 2",
+                mockBot.getMessages().get(2));
+        bot.processCommand(user, "5");
+        Assertions.assertEquals("Вы ошиблись, верный ответ: 6",
+                mockBot.getMessages().get(3));
+        Assertions.assertEquals("Тест завершен",
+                mockBot.getMessages().get(4));
     }
+
+    /**
+     * Тестирует команду повторения вопроса в боте.
+     * Этот тест проверяет, что бот отправляет тест на повторение (командйо "/repeat") полсе ошибочного ответа в тесте
+     */
+    @Test
+    public void testRepeatCommand(){
+        bot.processCommand(user, "/test");
+        bot.processCommand(user, "10");
+        Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
+                mockBot.getMessages().get(1));
+        bot.processCommand(user, "6");
+        bot.processCommand(user,"/repeat");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessages().get(5));
+        bot.processCommand(user, "100");
+        Assertions.assertEquals("Правильный ответ!",
+                mockBot.getMessages().get(6));
+        Assertions.assertEquals("Тест завершен",
+                mockBot.getMessages().get(7));
+
+        bot.processCommand(user,"/repeat");
+        Assertions.assertEquals("Нет вопросов для повторения",
+                mockBot.getMessages().get(8));
+    }
+
+    /**
+     * Тестирует команду повторения вопроса в боте.
+     * Этот тест проверяет, что бот отправляет тест на повторение (командйо "/repeat") полсе ошибочных ответов в тесте
+     */
+    @Test
+    public void testRepeatCommandIncorrectAnswers(){
+        bot.processCommand(user, "/test");
+        bot.processCommand(user, "10");
+        Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
+                mockBot.getMessages().get(1));
+        bot.processCommand(user, "5");
+        Assertions.assertEquals("Вы ошиблись, верный ответ: 6",
+                mockBot.getMessages().get(3));
+        bot.processCommand(user,"/repeat");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessages().get(5));
+        bot.processCommand(user, "100");
+        Assertions.assertEquals("Правильный ответ!",
+                mockBot.getMessages().get(6));
+        Assertions.assertEquals("Сколько будет 2 + 2 * 2",
+                mockBot.getMessages().get(7));
+        bot.processCommand(user, "6");
+        Assertions.assertEquals("Правильный ответ!",
+                mockBot.getMessages().get(8));
+        Assertions.assertEquals("Тест завершен",
+                mockBot.getMessages().get(9));
+
+        bot.processCommand(user,"/repeat");
+        Assertions.assertEquals("Нет вопросов для повторения",
+                mockBot.getMessages().get(10));
+    }
+
+    /**
+     * Тестирует команду /notify
+     * Проверяет, что бот правильно устанавливает напоминание и отправляет уведомление через заданное время
+     */
+    @Test
+    public void testNotify() throws InterruptedException {
+        bot.processCommand(user, "/notify");
+        Assertions.assertEquals("Введите текст напоминания", mockBot.getMessages().get(0));
+        bot.processCommand(user, "Привет!");
+        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessages().get(1));
+        bot.processCommand(user, "2");
+        Assertions.assertEquals("Напоминание установлено", mockBot.getMessages().get(2));
+        Assertions.assertEquals(3, mockBot.getMessages().size());
+
+        Thread.sleep(2010);
+        Assertions.assertEquals("Сработало напоминание: 'Привет!'", mockBot.getMessages().get(3));
+    }
+
+    /**
+     * Тестирование ошибки при установке уведомления
+     * с не целым числом значения времени
+     */
+    @Test
+    public void testNotifyNegativeTime() {
+        bot.processCommand(user, "/notify");
+        Assertions.assertEquals("Введите текст напоминания", mockBot.getMessages().get(0));
+        bot.processCommand(user, "Привет!");
+        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessages().get(1));
+        bot.processCommand(user, "2.5");
+        Assertions.assertEquals("Пожалуйста, введите целое число", mockBot.getMessages().get(2));
+    }
+
+
 }
