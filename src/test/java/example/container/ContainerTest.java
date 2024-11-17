@@ -22,7 +22,7 @@ class ContainerTest {
      * - добавленный элемент присутствует в контейнере
      */
     @Test
-    void add() {
+    void testAddOneItem() {
         container.add(item);
         assertEquals(1, container.size());
         assertTrue(container.contains(item));
@@ -35,7 +35,7 @@ class ContainerTest {
      * - удаленный элемент отсутствует в контейнере
      */
     @Test
-    void remove() {
+    void testRemoveOneItem() {
         container.add(item);
         container.remove(item);
         assertEquals(0, container.size());
@@ -51,6 +51,7 @@ class ContainerTest {
     @Test
     void addMultipleItems() {
         container.add(item);
+        assertEquals(1, container.size());
         container.add(item1);
         assertEquals(2, container.size());
         assertTrue(Set.of(item, item1).stream().allMatch(container::contains));

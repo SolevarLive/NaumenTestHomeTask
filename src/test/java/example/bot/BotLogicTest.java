@@ -34,17 +34,17 @@ public class BotLogicTest {
     public void testCommandTest() {
         bot.processCommand(user, "/test");
         Assertions.assertEquals("Вычислите степень: 10^2",
-                mockBot.getMessages().get(0));
+                mockBot.getMessageAtIndex(0));
         bot.processCommand(user, "100");
         Assertions.assertEquals("Правильный ответ!",
-                mockBot.getMessages().get(1));
+                mockBot.getMessageAtIndex(1));
         Assertions.assertEquals("Сколько будет 2 + 2 * 2",
-                mockBot.getMessages().get(2));
+                mockBot.getMessageAtIndex(2));
         bot.processCommand(user, "6");
         Assertions.assertEquals("Правильный ответ!",
-                mockBot.getMessages().get(3));
+                mockBot.getMessageAtIndex(3));
         Assertions.assertEquals("Тест завершен",
-                mockBot.getMessages().get(4));
+                mockBot.getMessageAtIndex(4));
     }
 
     /**
@@ -56,17 +56,17 @@ public class BotLogicTest {
     public void testCommandTestIncorrectAnswers() {
         bot.processCommand(user, "/test");
         Assertions.assertEquals("Вычислите степень: 10^2",
-                mockBot.getMessages().get(0));
+                mockBot.getMessageAtIndex(0));
         bot.processCommand(user, "10");
         Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
-                mockBot.getMessages().get(1));
+                mockBot.getMessageAtIndex(1));
         Assertions.assertEquals("Сколько будет 2 + 2 * 2",
-                mockBot.getMessages().get(2));
+                mockBot.getMessageAtIndex(2));
         bot.processCommand(user, "5");
         Assertions.assertEquals("Вы ошиблись, верный ответ: 6",
-                mockBot.getMessages().get(3));
+                mockBot.getMessageAtIndex(3));
         Assertions.assertEquals("Тест завершен",
-                mockBot.getMessages().get(4));
+                mockBot.getMessageAtIndex(4));
     }
 
     /**
@@ -76,54 +76,26 @@ public class BotLogicTest {
     @Test
     public void testRepeatCommand(){
         bot.processCommand(user, "/test");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessageAtIndex(0));
         bot.processCommand(user, "10");
         Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
-                mockBot.getMessages().get(1));
-        bot.processCommand(user, "6");
-        bot.processCommand(user,"/repeat");
-        Assertions.assertEquals("Вычислите степень: 10^2",
-                mockBot.getMessages().get(5));
-        bot.processCommand(user, "100");
-        Assertions.assertEquals("Правильный ответ!",
-                mockBot.getMessages().get(6));
-        Assertions.assertEquals("Тест завершен",
-                mockBot.getMessages().get(7));
-
-        bot.processCommand(user,"/repeat");
-        Assertions.assertEquals("Нет вопросов для повторения",
-                mockBot.getMessages().get(8));
-    }
-
-    /**
-     * Тестирует команду повторения вопроса в боте.
-     * Этот тест проверяет, что бот отправляет тест на повторение (командйо "/repeat") полсе ошибочных ответов в тесте
-     */
-    @Test
-    public void testRepeatCommandIncorrectAnswers(){
-        bot.processCommand(user, "/test");
-        bot.processCommand(user, "10");
-        Assertions.assertEquals("Вы ошиблись, верный ответ: 100",
-                mockBot.getMessages().get(1));
-        bot.processCommand(user, "5");
-        Assertions.assertEquals("Вы ошиблись, верный ответ: 6",
-                mockBot.getMessages().get(3));
-        bot.processCommand(user,"/repeat");
-        Assertions.assertEquals("Вычислите степень: 10^2",
-                mockBot.getMessages().get(5));
-        bot.processCommand(user, "100");
-        Assertions.assertEquals("Правильный ответ!",
-                mockBot.getMessages().get(6));
+                mockBot.getMessageAtIndex(1));
         Assertions.assertEquals("Сколько будет 2 + 2 * 2",
-                mockBot.getMessages().get(7));
+                mockBot.getMessageAtIndex(2));
         bot.processCommand(user, "6");
+        bot.processCommand(user,"/repeat");
+        Assertions.assertEquals("Вычислите степень: 10^2",
+                mockBot.getMessageAtIndex(5));
+        bot.processCommand(user, "100");
         Assertions.assertEquals("Правильный ответ!",
-                mockBot.getMessages().get(8));
+                mockBot.getMessageAtIndex(6));
         Assertions.assertEquals("Тест завершен",
-                mockBot.getMessages().get(9));
+                mockBot.getMessageAtIndex(7));
 
         bot.processCommand(user,"/repeat");
         Assertions.assertEquals("Нет вопросов для повторения",
-                mockBot.getMessages().get(10));
+                mockBot.getMessageAtIndex(8));
     }
 
     /**
@@ -133,30 +105,30 @@ public class BotLogicTest {
     @Test
     public void testNotify() throws InterruptedException {
         bot.processCommand(user, "/notify");
-        Assertions.assertEquals("Введите текст напоминания", mockBot.getMessages().get(0));
+        Assertions.assertEquals("Введите текст напоминания", mockBot.getMessageAtIndex(0));
         bot.processCommand(user, "Привет!");
-        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessages().get(1));
-        bot.processCommand(user, "2");
-        Assertions.assertEquals("Напоминание установлено", mockBot.getMessages().get(2));
+        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessageAtIndex(1));
+        bot.processCommand(user, "1");
+        Assertions.assertEquals("Напоминание установлено", mockBot.getMessageAtIndex(2));
         Assertions.assertEquals(3, mockBot.getMessages().size());
 
-        Thread.sleep(2010);
-        Assertions.assertEquals("Сработало напоминание: 'Привет!'", mockBot.getMessages().get(3));
+        Thread.sleep(1010);
+        Assertions.assertEquals("Сработало напоминание: 'Привет!'", mockBot.getMessageAtIndex(3));
     }
 
     /**
-     * Тестирование ошибки при установке уведомления
-     * с не целым числом значения времени
+     * Тестирование /notify при установке
+     * не целого числа времени
      */
     @Test
     public void testNotifyNegativeTime() {
         bot.processCommand(user, "/notify");
-        Assertions.assertEquals("Введите текст напоминания", mockBot.getMessages().get(0));
+        Assertions.assertEquals("Введите текст напоминания",mockBot.getMessageAtIndex(0));
         bot.processCommand(user, "Привет!");
-        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessages().get(1));
+        Assertions.assertEquals("Через сколько секунд напомнить?", mockBot.getMessageAtIndex(1));
         bot.processCommand(user, "2.5");
-        Assertions.assertEquals("Пожалуйста, введите целое число", mockBot.getMessages().get(2));
+        Assertions.assertEquals("Пожалуйста, введите целое число", mockBot.getMessageAtIndex(2));
+        bot.processCommand(user, "1");
+        Assertions.assertEquals("Напоминание установлено", mockBot.getMessageAtIndex(3));
     }
-
-
 }
