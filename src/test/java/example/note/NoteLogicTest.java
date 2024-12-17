@@ -85,4 +85,9 @@ class NoteLogicTest {
         });
         assertEquals("Unknown command", exception.getMessage());
     }
+
+    /**
+     * ТУТ ПРОВЕРКА
+     *
+     */
 }
